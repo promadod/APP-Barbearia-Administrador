@@ -8154,7 +8154,7 @@ this.b=b},
 aGv:function aGv(a,b){this.a=a
 this.b=b},
 aGx:function aGx(a){this.a=a},
-mb(){var s="application/json",r=A.b0b("http://192.168.11.144:8000/api/",B.yw,A.aK(["Content-Type",s,"Accept",s],t.N,t.z),B.yw),q=new A.S8(A.b([B.Vh],t.i6))
+mb(){var s="application/json",r=A.b0b("https://oneiratech01.pythonanywhere.com/api/",B.yw,A.aK(["Content-Type",s,"Accept",s],t.N,t.z),B.yw),q=new A.S8(A.b([B.Vh],t.i6))
 q.a4(q,B.a52)
 q=new A.aee($,q,$,new A.ahC(51200),!1)
 q.tW$=r
