@@ -48914,7 +48914,7 @@ s=8
 return A.F(n.a.a.mr(0,"salao/perfil/",j),$async$v0)
 case 8:m=b
 l=m.a
-j=A.aK(["nome",J.aQ(l,"nome"),"telefone",J.aQ(l,"whatsapp"),"instagram",J.aQ(l,"instagram"),"endereco",J.aQ(l,"endereco"),"bloqueia_conflitos",J.aQ(l,"bloqueia_conflitos")],t.N,j)
+j=A.aK(["id",J.aQ(l,"id"),"nome",J.aQ(l,"nome"),"telefone",J.aQ(l,"whatsapp"),"instagram",J.aQ(l,"instagram"),"endereco",J.aQ(l,"endereco"),"bloqueia_conflitos",J.aQ(l,"bloqueia_conflitos")],t.N,j)
 q=j
 s=1
 break
