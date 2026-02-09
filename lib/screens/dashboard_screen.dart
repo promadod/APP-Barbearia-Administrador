@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/salao_service.dart';
+import '../config.dart'; 
 import 'login_screen.dart';
 import 'servicos_screen.dart';
 
@@ -62,22 +63,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final moeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
     final dia = DateFormat("d 'de' MMMM", 'pt_BR').format(DateTime.now());
 
-    // USAMOS STACK PARA COLOCAR A FOTO ATRÁS DE TUDO
+    // --- VARIÁVEIS DE COR DINÂMICAS ---
+    
+    final primaryColor = Theme.of(context).primaryColor;
+    final secondaryColor = Theme.of(context).colorScheme.secondary;
+
     return Stack(
       children: [
-        // 1. A FOTO DE FUNDO
+        // 1. A FOTO DE FUNDO DINÂMICA
         Positioned.fill(
           child: Image.asset(
-            'assets/images/login_bg.jpeg', 
+            AppConfig.assetBackground, 
             fit: BoxFit.cover,
           ),
         ),
 
-        // 2. MÁSCARA BRANCA (AJUSTADA PARA FICAR MAIS TRANSPARENTE)
+        // 2. MÁSCARA BRANCA
         Positioned.fill(
           child: Container(
-            // MUDANÇA AQUI: De 0.92 para 0.8 para mostrar mais a foto
-            color: Colors.white.withOpacity(0.7), 
+            color: Colors.white.withOpacity(0.55), 
           ),
         ),
 
@@ -85,42 +89,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Scaffold(
           backgroundColor: Colors.transparent, 
           appBar: AppBar(
-            title: Text('Visão Geral', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+            title: Text('Visão Geral', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: Colors.black87)),
             backgroundColor: Colors.transparent,
             elevation: 0,
+            iconTheme: IconThemeData(color: primaryColor), 
             actions: [
-              IconButton(icon: const Icon(Icons.exit_to_app), onPressed: _logout)
+              IconButton(icon: Icon(Icons.exit_to_app, color: primaryColor), onPressed: _logout)
             ],
           ),
           
           body: RefreshIndicator(
             onRefresh: _carregarDados,
-            color: const Color(0xFFE91E63),
+            color: primaryColor, 
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Cor do texto da data ligeiramente mais escura para contraste
                   Text("Hoje, $dia", style: GoogleFonts.poppins(color: Colors.grey[800])),
-                  Text("Olá, $_nomeUsuario!", style: GoogleFonts.poppins(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFFE91E63))),
+                  
+                  
+                  Text(
+                    "Olá, $_nomeUsuario!", 
+                    style: GoogleFonts.poppins(
+                      fontSize: 26, 
+                      fontWeight: FontWeight.bold, 
+                      color: primaryColor 
+                    )
+                  ),
 
                   const SizedBox(height: 25),
 
-                  // CARD FATURAMENTO
+                  // CARD FATURAMENTO (GRADIENTE DINÂMICO)
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFEC407A), Color(0xFFAB47BC)], 
+                      gradient: LinearGradient(
+                        
+                        colors: [primaryColor, secondaryColor], 
                         begin: Alignment.topLeft, 
                         end: Alignment.bottomRight
                       ),
                       borderRadius: BorderRadius.circular(25),
                       boxShadow: [
-                        BoxShadow(color: const Color(0xFFEC407A).withOpacity(0.4), blurRadius: 15, offset: const Offset(0, 8))
+                        BoxShadow(color: primaryColor.withOpacity(0.4), blurRadius: 15, offset: const Offset(0, 8))
                       ],
                     ),
                     child: Column(
@@ -150,6 +164,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     mainAxisSpacing: 15,
                     children: [
                       _buildClickableStatsCard(
+                        context: context, 
                         icon: Icons.calendar_month,
                         value: _isLoading ? "..." : "$_agendamentosHoje",
                         title: "Agendamentos",
@@ -158,6 +173,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       
                       _buildClickableStatsCard(
+                        context: context,
                         icon: Icons.pending_actions,
                         value: _isLoading ? "..." : "$_pendentes",
                         title: "Pendentes",
@@ -177,7 +193,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             },
             label: const Text("Serviços"),
             icon: const Icon(Icons.add),
-            backgroundColor: const Color(0xFFE91E63),
+            backgroundColor: primaryColor, 
             foregroundColor: Colors.white,
           ),
         ),
@@ -186,27 +202,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildClickableStatsCard({
+    required BuildContext context, 
     required IconData icon, 
     required String value, 
     required String title, 
     VoidCallback? onTap,
     bool useGradient = false,
   }) {
+    // VARIÁVEIS DE COR LOCAIS BASEADAS NO TEMA
+    final primaryColor = Theme.of(context).primaryColor;
+    final secondaryColor = Theme.of(context).colorScheme.secondary;
+
     final Color textColor = useGradient ? Colors.white : Colors.black87;
     final Color subTextColor = useGradient ? Colors.white70 : Colors.grey;
-    final Color iconColor = useGradient ? Colors.white : const Color(0xFFE91E63);
-    final Color iconBgColor = useGradient ? Colors.white.withOpacity(0.2) : const Color(0xFFE91E63).withOpacity(0.1);
+    final Color iconColor = useGradient ? Colors.white : primaryColor; 
+    final Color iconBgColor = useGradient ? Colors.white.withOpacity(0.2) : primaryColor.withOpacity(0.1);
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          // Leve transparência também nos cards brancos para integrar com o fundo
-          color: useGradient ? null : Colors.white.withOpacity(0.95), 
+          color: useGradient ? null : Colors.white.withOpacity(0.75), 
           gradient: useGradient 
-            ? const LinearGradient(
-                colors: [Color(0xFFEC407A), Color(0xFFAB47BC)],
+            ? LinearGradient(
+                colors: [primaryColor, secondaryColor], 
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               )
@@ -214,7 +234,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: useGradient ? const Color(0xFFEC407A).withOpacity(0.4) : Colors.grey.withOpacity(0.05),
+              
+              color: useGradient ? primaryColor.withOpacity(0.4) : Colors.grey.withOpacity(0.05),
               blurRadius: 10,
               offset: const Offset(0, 5)
             )

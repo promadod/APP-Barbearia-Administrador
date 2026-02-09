@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../services/salao_service.dart';
+import '../config.dart'; 
 
 class HistoricoAgendamentosScreen extends StatefulWidget {
   const HistoricoAgendamentosScreen({super.key});
@@ -48,6 +49,9 @@ class _HistoricoAgendamentosScreenState extends State<HistoricoAgendamentosScree
   }
 
   Future<void> _selecionarData() async {
+    // Cor Dinâmica para o Calendário
+    final primaryColor = Theme.of(context).primaryColor;
+
     final picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -55,11 +59,11 @@ class _HistoricoAgendamentosScreenState extends State<HistoricoAgendamentosScree
       lastDate: DateTime(2030),
       locale: const Locale('pt', 'BR'),
       builder: (context, child) {
-        // Personaliza o calendário para ficar rosa
+        // Personaliza o calendário com a cor do tema (Azul ou Rosa)
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xFFE91E63), // Rosa
+            colorScheme: ColorScheme.light(
+              primary: primaryColor, 
               onPrimary: Colors.white,
               onSurface: Colors.black,
             ),
@@ -76,27 +80,29 @@ class _HistoricoAgendamentosScreenState extends State<HistoricoAgendamentosScree
 
   @override
   Widget build(BuildContext context) {
-    // 1. ESTRUTURA STACK PARA O FUNDO COM FOTO
+    // COR DINÂMICA
+    final primaryColor = Theme.of(context).primaryColor;
+
     return Stack(
       children: [
-        // A. FOTO DE FUNDO
+        // A. FOTO DE FUNDO DINÂMICA
         Positioned.fill(
-          child: Image.asset('assets/images/login_bg.jpeg', fit: BoxFit.cover),
+          child: Image.asset(AppConfig.assetBackground, fit: BoxFit.cover),
         ),
         
-        // B. MÁSCARA BRANCA (0.7)
+        // B. MÁSCARA BRANCA 0.60
         Positioned.fill(
-          child: Container(color: Colors.white.withOpacity(0.7)),
+          child: Container(color: Colors.white.withOpacity(0.60)),
         ),
 
         // C. CONTEÚDO
         Scaffold(
-          backgroundColor: Colors.transparent, // Transparente para ver o fundo
+          backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: Text("Histórico Completo", style: GoogleFonts.poppins(color: const Color(0xFF880E4F), fontWeight: FontWeight.bold)),
+            title: Text("Histórico Completo", style: GoogleFonts.poppins(color: Colors.black87, fontWeight: FontWeight.bold)),
             backgroundColor: Colors.transparent,
             elevation: 0,
-            iconTheme: const IconThemeData(color: Color(0xFFE91E63)), // Ícone Rosa
+            iconTheme: IconThemeData(color: primaryColor), 
           ),
           body: Column(
             children: [
@@ -104,7 +110,7 @@ class _HistoricoAgendamentosScreenState extends State<HistoricoAgendamentosScree
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9), // Leve transparência
+                  color: Colors.white.withOpacity(0.9),
                   borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
                   boxShadow: [
                     BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5))
@@ -127,7 +133,7 @@ class _HistoricoAgendamentosScreenState extends State<HistoricoAgendamentosScree
                               child: DropdownButton<String>(
                                 value: _statusSelecionado,
                                 isExpanded: true,
-                                icon: const Icon(Icons.filter_list, color: Color(0xFFE91E63)),
+                                icon: Icon(Icons.filter_list, color: primaryColor), 
                                 items: const [
                                   DropdownMenuItem(value: 'TODOS', child: Text("Todos Status")),
                                   DropdownMenuItem(value: 'PENDENTE', child: Text("Pendentes")),
@@ -152,20 +158,20 @@ class _HistoricoAgendamentosScreenState extends State<HistoricoAgendamentosScree
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFE91E63).withOpacity(0.1), // Rosa claro
+                                color: primaryColor.withOpacity(0.1), 
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: const Color(0xFFE91E63).withOpacity(0.3))
+                                border: Border.all(color: primaryColor.withOpacity(0.3))
                               ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(Icons.calendar_today, size: 16, color: Color(0xFFE91E63)),
+                                  Icon(Icons.calendar_today, size: 16, color: primaryColor), 
                                   const SizedBox(width: 5),
                                   Text(
                                     _dataSelecionada == null 
                                       ? "Data" 
                                       : DateFormat('dd/MM').format(_dataSelecionada!),
-                                    style: const TextStyle(color: Color(0xFFE91E63), fontWeight: FontWeight.bold),
+                                    style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold), 
                                   ),
                                 ],
                               ),
@@ -183,7 +189,7 @@ class _HistoricoAgendamentosScreenState extends State<HistoricoAgendamentosScree
               // --- LISTA DE RESULTADOS ---
               Expanded(
                 child: _isLoading 
-                  ? const Center(child: CircularProgressIndicator(color: Color(0xFFE91E63)))
+                  ? Center(child: CircularProgressIndicator(color: primaryColor))
                   : _agendamentos.isEmpty
                     ? Center(
                         child: Column(
@@ -215,7 +221,7 @@ class _HistoricoAgendamentosScreenState extends State<HistoricoAgendamentosScree
 
                           return Card(
                             elevation: 2,
-                            color: Colors.white.withOpacity(0.95), // Card quase sólido
+                            color: Colors.white.withOpacity(0.95),
                             margin: const EdgeInsets.only(bottom: 12),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             child: Padding(

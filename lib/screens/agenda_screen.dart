@@ -4,6 +4,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../services/salao_service.dart';
+import '../config.dart';
 
 class AgendaScreen extends StatefulWidget {
   const AgendaScreen({super.key});
@@ -72,19 +73,22 @@ class _AgendaScreenState extends State<AgendaScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // STACK PARA O FUNDO
+    // COR DINÂMICA (Azul ou Rosa)
+    final primaryColor = Theme.of(context).primaryColor;
+
     return Stack(
       children: [
-        // 1. FOTO
-        Positioned.fill(child: Image.asset('assets/images/login_bg.jpeg', fit: BoxFit.cover)),
-        // 2. MÁSCARA 0.7
-        Positioned.fill(child: Container(color: Colors.white.withOpacity(0.7))),
+        // 1. FOTO DE FUNDO DINÂMICA
+        Positioned.fill(child: Image.asset(AppConfig.assetBackground, fit: BoxFit.cover)),
+        
+        // 2. MÁSCARA 0.60 (SOLICITADO)
+        Positioned.fill(child: Container(color: Colors.white.withOpacity(0.60))),
 
         // 3. CONTEÚDO
         Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: Text("Agendamentos", style: GoogleFonts.poppins(color: const Color(0xFF880E4F), fontWeight: FontWeight.bold)),
+            title: Text("Agendamentos", style: GoogleFonts.poppins(color: Colors.black87, fontWeight: FontWeight.bold)),
             backgroundColor: Colors.transparent,
             elevation: 0,
             automaticallyImplyLeading: false, 
@@ -94,7 +98,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
               Container(
                 margin: const EdgeInsets.fromLTRB(20, 10, 20, 20),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.95), // Leve transparência
+                  color: Colors.white.withOpacity(0.95), 
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5))],
                 ),
@@ -113,23 +117,23 @@ class _AgendaScreenState extends State<AgendaScreen> {
                   },
                   onPageChanged: (focusedDay) => _focusedDay = focusedDay,
                   eventLoader: _getAgendamentosDoDia,
-                  headerStyle: const HeaderStyle(
+                  headerStyle: HeaderStyle(
                     titleCentered: true, formatButtonVisible: false,
-                    titleTextStyle: TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold),
-                    leftChevronIcon: Icon(Icons.chevron_left, color: Color(0xFFE91E63)),
-                    rightChevronIcon: Icon(Icons.chevron_right, color: Color(0xFFE91E63)),
+                    titleTextStyle: const TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold),
+                    leftChevronIcon: Icon(Icons.chevron_left, color: primaryColor),
+                    rightChevronIcon: Icon(Icons.chevron_right, color: primaryColor),
                   ),
-                  calendarStyle: const CalendarStyle(
-                    todayDecoration: BoxDecoration(color: Color(0xFFF48FB1), shape: BoxShape.circle),
-                    selectedDecoration: BoxDecoration(color: Color(0xFFE91E63), shape: BoxShape.circle),
-                    markerDecoration: BoxDecoration(color: Color(0xFF880E4F), shape: BoxShape.circle),
+                  calendarStyle: CalendarStyle(
+                    todayDecoration: BoxDecoration(color: primaryColor.withOpacity(0.5), shape: BoxShape.circle),
+                    selectedDecoration: BoxDecoration(color: primaryColor, shape: BoxShape.circle),
+                    markerDecoration: BoxDecoration(color: primaryColor, shape: BoxShape.circle),
                   ),
                 ),
               ),
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: _buildListaAgendamentos(),
+                  child: _buildListaAgendamentos(primaryColor),
                 ),
               ),
             ],
@@ -139,9 +143,9 @@ class _AgendaScreenState extends State<AgendaScreen> {
     );
   }
 
-  Widget _buildListaAgendamentos() {
+  Widget _buildListaAgendamentos(Color primaryColor) {
     final eventos = _getAgendamentosDoDia(_selectedDay!);
-    if (_isLoading) return const Center(child: CircularProgressIndicator(color: Color(0xFFE91E63)));
+    if (_isLoading) return Center(child: CircularProgressIndicator(color: primaryColor));
     if (eventos.isEmpty) return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.event_note, size: 50, color: Colors.grey[600]), const SizedBox(height: 10), Text("Sem agendamentos.", style: GoogleFonts.poppins(color: Colors.grey[800]))]));
 
     return ListView.builder(
@@ -163,7 +167,7 @@ class _AgendaScreenState extends State<AgendaScreen> {
 
         return Card(
           elevation: 0,
-          color: Colors.white.withOpacity(0.95), // Card quase sólido
+          color: Colors.white.withOpacity(0.95),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: BorderSide(color: Colors.grey.withOpacity(0.1))),
           margin: const EdgeInsets.only(bottom: 12),
           child: Padding(
@@ -172,7 +176,14 @@ class _AgendaScreenState extends State<AgendaScreen> {
               children: [
                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                   Expanded(child: Row(children: [
-                    Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), decoration: BoxDecoration(color: Colors.pink[50], borderRadius: BorderRadius.circular(8)), child: Text(hora, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFFE91E63)))),
+                    Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5), 
+                        decoration: BoxDecoration(
+                            color: primaryColor.withOpacity(0.1), 
+                            borderRadius: BorderRadius.circular(8)
+                        ),
+                        child: Text(hora, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: primaryColor))
+                    ),
                     const SizedBox(width: 15),
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(cliente, style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16)), Text(servico, style: GoogleFonts.poppins(fontSize: 13, color: Colors.grey))])),
                   ])),

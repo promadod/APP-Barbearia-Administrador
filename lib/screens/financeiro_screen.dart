@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../services/salao_service.dart';
+import '../config.dart'; 
 
 class FinanceiroScreen extends StatefulWidget {
   const FinanceiroScreen({super.key});
@@ -16,7 +17,7 @@ class _FinanceiroScreenState extends State<FinanceiroScreen> {
   bool _isLoading = true;
   double _faturamento = 0.0;
   int _qtdServicos = 0;
-  List<dynamic> _historico = []; // Nova lista para o extrato
+  List<dynamic> _historico = [];
 
   @override
   void initState() {
@@ -32,7 +33,7 @@ class _FinanceiroScreenState extends State<FinanceiroScreen> {
       setState(() {
         _faturamento = double.tryParse(dados['faturamento_total'].toString()) ?? 0.0;
         _qtdServicos = int.tryParse(dados['quantidade_servicos'].toString()) ?? 0;
-        _historico = dados['historico'] ?? []; // Pega a lista detalhada do Django
+        _historico = dados['historico'] ?? [];
         _isLoading = false;
       });
     }
@@ -41,22 +42,27 @@ class _FinanceiroScreenState extends State<FinanceiroScreen> {
   @override
   Widget build(BuildContext context) {
     final moeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+    
+    // VARIÁVEIS DE COR DINÂMICAS
+    final primaryColor = Theme.of(context).primaryColor;
+    final secondaryColor = Theme.of(context).colorScheme.secondary;
 
     return Stack(
       children: [
-        // 1. FOTO
-        Positioned.fill(child: Image.asset('assets/images/login_bg.jpeg', fit: BoxFit.cover)),
-        // 2. MÁSCARA 0.7
-        Positioned.fill(child: Container(color: Colors.white.withOpacity(0.7))),
+        // 1. FOTO DE FUNDO DINÂMICA
+        Positioned.fill(child: Image.asset(AppConfig.assetBackground, fit: BoxFit.cover)),
+        
+        // 2. MÁSCARA 0.60
+        Positioned.fill(child: Container(color: Colors.white.withOpacity(0.60))),
 
         // 3. CONTEÚDO
         Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: Text("Financeiro", style: GoogleFonts.poppins(color: const Color(0xFF880E4F), fontWeight: FontWeight.bold)),
+            title: Text("Financeiro", style: GoogleFonts.poppins(color: Colors.black87, fontWeight: FontWeight.bold)),
             backgroundColor: Colors.transparent,
             elevation: 0,
-            iconTheme: const IconThemeData(color: Color(0xFFE91E63)),
+            iconTheme: IconThemeData(color: primaryColor), 
           ),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
@@ -70,7 +76,7 @@ class _FinanceiroScreenState extends State<FinanceiroScreen> {
                     child: DropdownButton<String>(
                       value: _periodoSelecionado,
                       isExpanded: true,
-                      icon: const Icon(Icons.calendar_month, color: Color(0xFFE91E63)),
+                      icon: Icon(Icons.calendar_month, color: primaryColor), 
                       items: const [
                         DropdownMenuItem(value: 'hoje', child: Text("Hoje")),
                         DropdownMenuItem(value: 'semana', child: Text("Esta Semana")),
@@ -84,7 +90,7 @@ class _FinanceiroScreenState extends State<FinanceiroScreen> {
                 const SizedBox(height: 20),
 
                 _isLoading 
-                ? const Expanded(child: Center(child: CircularProgressIndicator(color: Color(0xFFE91E63))))
+                ? Expanded(child: Center(child: CircularProgressIndicator(color: primaryColor)))
                 : Expanded(
                     child: SingleChildScrollView(
                       child: Column(
@@ -95,9 +101,13 @@ class _FinanceiroScreenState extends State<FinanceiroScreen> {
                             width: double.infinity,
                             padding: const EdgeInsets.all(25),
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(colors: [Color(0xFFEC407A), Color(0xFFAB47BC)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                              gradient: LinearGradient(
+                                colors: [primaryColor, secondaryColor], 
+                                begin: Alignment.topLeft, 
+                                end: Alignment.bottomRight
+                              ),
                               borderRadius: BorderRadius.circular(20),
-                              boxShadow: [BoxShadow(color: const Color(0xFFEC407A).withOpacity(0.4), blurRadius: 10, offset: const Offset(0, 5))],
+                              boxShadow: [BoxShadow(color: primaryColor.withOpacity(0.4), blurRadius: 10, offset: const Offset(0, 5))],
                             ),
                             child: Column(
                               children: [
@@ -119,12 +129,12 @@ class _FinanceiroScreenState extends State<FinanceiroScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text("Serviços Realizados ($_qtdServicos)", style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey[800])),
-                              const Icon(Icons.history, color: Color(0xFFE91E63)),
+                              Icon(Icons.history, color: primaryColor), 
                             ],
                           ),
                           const SizedBox(height: 10),
 
-                          // --- LISTA DETALHADA (SUBSTITUI O CARD PEQUENO) ---
+                          // --- LISTA DETALHADA ---
                           if (_historico.isEmpty)
                             Container(
                               width: double.infinity,
@@ -139,7 +149,7 @@ class _FinanceiroScreenState extends State<FinanceiroScreen> {
                             )
                           else
                             ListView.builder(
-                              shrinkWrap: true, // Importante para rolar dentro do SingleChildScrollView
+                              shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
                               itemCount: _historico.length,
                               itemBuilder: (context, index) {
@@ -176,14 +186,14 @@ class _FinanceiroScreenState extends State<FinanceiroScreen> {
                                     ),
                                     trailing: Text(
                                       moeda.format(valor),
-                                      style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: const Color(0xFFE91E63), fontSize: 16),
+                                      style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: primaryColor, fontSize: 16), 
                                     ),
                                   ),
                                 );
                               },
                             ),
                             
-                            const SizedBox(height: 20), // Espaço final
+                            const SizedBox(height: 20),
                         ],
                       ),
                     ),

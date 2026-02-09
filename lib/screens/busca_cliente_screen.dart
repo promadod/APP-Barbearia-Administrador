@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../services/salao_service.dart';
+import '../config.dart'; 
 
 class BuscaClienteScreen extends StatefulWidget {
   const BuscaClienteScreen({super.key});
@@ -63,22 +64,23 @@ class _BuscaClienteScreenState extends State<BuscaClienteScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // USAMOS O STACK PARA O FUNDO
+    final primaryColor = Theme.of(context).primaryColor;
+
     return Stack(
       children: [
         // 1. FOTO DE FUNDO
         Positioned.fill(
-          child: Image.asset('assets/images/login_bg.jpeg', fit: BoxFit.cover),
+          child: Image.asset(AppConfig.assetBackground, fit: BoxFit.cover),
         ),
         
-        // 2. MÁSCARA BRANCA (0.7)
+        // 2. MÁSCARA 0.60
         Positioned.fill(
-          child: Container(color: Colors.white.withOpacity(0.7)),
+          child: Container(color: Colors.white.withOpacity(0.60)),
         ),
 
         // 3. CONTEÚDO
         Scaffold(
-          backgroundColor: Colors.transparent, // Transparente para ver a foto
+          backgroundColor: Colors.transparent,
           appBar: AppBar(
             title: Text("Buscar Clientes", style: GoogleFonts.poppins(color: Colors.black, fontWeight: FontWeight.bold)),
             backgroundColor: Colors.transparent,
@@ -89,15 +91,15 @@ class _BuscaClienteScreenState extends State<BuscaClienteScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                // CAMPO DE BUSCA
+                
                 TextField(
                   controller: _searchController,
                   onChanged: _onSearchChanged,
                   decoration: InputDecoration(
                     hintText: "Digite o nome ou telefone...",
-                    prefixIcon: const Icon(Icons.search, color: Color(0xFFE91E63)),
+                    prefixIcon: Icon(Icons.search, color: primaryColor), 
                     filled: true,
-                    fillColor: Colors.white.withOpacity(0.9), // Leve transparência no input
+                    fillColor: Colors.white.withOpacity(0.9),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                     contentPadding: const EdgeInsets.symmetric(vertical: 16),
                   ),
@@ -105,10 +107,10 @@ class _BuscaClienteScreenState extends State<BuscaClienteScreen> {
 
                 const SizedBox(height: 20),
 
-                // RESULTADOS
+                
                 Expanded(
                   child: _isLoading 
-                    ? const Center(child: CircularProgressIndicator(color: Color(0xFFE91E63)))
+                    ? Center(child: CircularProgressIndicator(color: primaryColor))
                     : _clientes.isEmpty 
                       ? Center(
                           child: Column(
@@ -132,12 +134,12 @@ class _BuscaClienteScreenState extends State<BuscaClienteScreen> {
 
                             return Card(
                               margin: const EdgeInsets.only(bottom: 10),
-                              color: Colors.white.withOpacity(0.95), // Card quase sólido
+                              color: Colors.white.withOpacity(0.95),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                               child: ListTile(
                                 leading: CircleAvatar(
-                                  backgroundColor: const Color(0xFFFCE4EC),
-                                  child: Text(nome[0].toUpperCase(), style: const TextStyle(color: Color(0xFFE91E63), fontWeight: FontWeight.bold)),
+                                  backgroundColor: primaryColor.withOpacity(0.1), 
+                                  child: Text(nome[0].toUpperCase(), style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
                                 ),
                                 title: Text(nome, style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
                                 subtitle: Text(telefone, style: GoogleFonts.poppins(fontSize: 12)),

@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_client.dart';
+import '../config.dart'; 
 
 class ConfigHorariosScreen extends StatefulWidget {
   const ConfigHorariosScreen({super.key});
@@ -48,15 +49,19 @@ class _ConfigHorariosScreenState extends State<ConfigHorariosScreen> {
     } catch (e) {
       print("ERRO DETALHADO: $e");
       if (e is DioException && e.response?.statusCode == 401) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Erro de permissão. Faça login novamente.")),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Erro de permissão. Faça login novamente.")),
+          );
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Erro ao carregar horários.")),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Erro ao carregar horários.")),
+          );
+        }
       }
-      setState(() => _isLoading = false);
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -74,14 +79,19 @@ class _ConfigHorariosScreenState extends State<ConfigHorariosScreen> {
       await _client.dio.patch('horarios/$id/', data: dadosNovos);
     } catch (e) {
       print("Erro ao salvar: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Erro ao salvar. Tente novamente.")),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Erro ao salvar. Tente novamente.")),
+        );
+      }
       _carregarHorarios();
     }
   }
 
   Future<void> _selecionarHora(int index, String campo, String valorAtual) async {
+    
+    final primaryColor = Theme.of(context).primaryColor;
+
     TimeOfDay horaInicial = const TimeOfDay(hour: 9, minute: 0);
     try {
       final parts = valorAtual.split(':');
@@ -92,15 +102,17 @@ class _ConfigHorariosScreenState extends State<ConfigHorariosScreen> {
       context: context,
       initialTime: horaInicial,
       builder: (context, child) {
-        // TEMA DO RELÓGIO AJUSTADO PARA ROSA
+        // TEMA DO RELÓGIO DINÂMICO
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: const Color(0xFFE91E63), // Rosa
-            colorScheme: const ColorScheme.light(primary: Color(0xFFE91E63)),
+            primaryColor: primaryColor,
+            colorScheme: ColorScheme.light(primary: primaryColor),
             buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
             timePickerTheme: TimePickerThemeData(
-              dialHandColor: const Color(0xFFE91E63),
-              dialBackgroundColor: Colors.pink[50],
+              dialHandColor: primaryColor,
+              dialBackgroundColor: primaryColor.withOpacity(0.1),
+              hourMinuteColor: primaryColor.withOpacity(0.1),
+              hourMinuteTextColor: primaryColor,
             )
           ),
           child: child!,
@@ -116,105 +128,99 @@ class _ConfigHorariosScreenState extends State<ConfigHorariosScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).primaryColor;
+
     // 1. ESTRUTURA STACK (Fundo + Máscara + Conteúdo)
     return Stack(
       children: [
         // A. FOTO
         Positioned.fill(
-          child: Image.asset('assets/images/login_bg.jpeg', fit: BoxFit.cover),
+          child: Image.asset(AppConfig.assetBackground, fit: BoxFit.cover),
         ),
-        // B. MÁSCARA BRANCA 0.7
+        // B. MÁSCARA BRANCA 0.60
         Positioned.fill(
-          child: Container(color: Colors.white.withOpacity(0.7)),
+          child: Container(color: Colors.white.withOpacity(0.60)),
         ),
 
         // C. CONTEÚDO
         Scaffold(
-          backgroundColor: Colors.transparent, // Importante para ver o fundo
+          backgroundColor: Colors.transparent, 
           appBar: AppBar(
             title: Text(
               "Horários de Funcionamento", 
-              style: GoogleFonts.poppins(color: const Color(0xFF880E4F), fontWeight: FontWeight.bold)
+              style: GoogleFonts.poppins(color: Colors.black87, fontWeight: FontWeight.bold)
             ),
             backgroundColor: Colors.transparent,
             elevation: 0,
-            iconTheme: const IconThemeData(color: Color(0xFFE91E63)), // Ícone Rosa
+            iconTheme: IconThemeData(color: primaryColor), 
           ),
           body: _isLoading
-              ? const Center(child: CircularProgressIndicator(color: Color(0xFFE91E63)))
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _horarios.length,
-                  itemBuilder: (context, index) {
-                    final item = _horarios[index];
-                    final diaNome = item['dia_nome'] ?? "Dia $index";
-                    final bool ativo = item['ativo'] ?? false;
-                    final String abertura = item['abertura']?.toString().substring(0, 5) ?? "09:00";
-                    final String fechamento = item['fechamento']?.toString().substring(0, 5) ?? "18:00";
+            ? Center(child: CircularProgressIndicator(color: primaryColor))
+            : ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: _horarios.length,
+                itemBuilder: (context, index) {
+                  final item = _horarios[index];
+                  final diaNome = item['dia_nome'] ?? "Dia $index";
+                  final bool ativo = item['ativo'] ?? false;
+                  final String abertura = item['abertura']?.toString().substring(0, 5) ?? "09:00";
+                  final String fechamento = item['fechamento']?.toString().substring(0, 5) ?? "18:00";
 
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      color: Colors.white.withOpacity(0.95), // Card levemente transparente
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                      elevation: 2,
-                      child: Column(
-                        children: [
-                          SwitchListTile(
-                            activeColor: const Color(0xFFE91E63), // Switch Rosa
-                            title: Text(
-                              diaNome,
-                              style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16)
-                            ),
-                            value: ativo,
-                            onChanged: (val) => _atualizarHorario(index, {'ativo': val}),
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    color: Colors.white.withOpacity(0.95), 
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    elevation: 2,
+                    child: Column(
+                      children: [
+                        SwitchListTile(
+                          activeColor: primaryColor, 
+                          title: Text(
+                            diaNome,
+                            style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16)
                           ),
-                          if (ativo)
-                            Padding(
-                              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  _buildTimeButton(
-                                    "Abertura",
-                                    abertura,
-                                    () => _selecionarHora(index, 'abertura', abertura)
-                                  ),
-                                  const Icon(Icons.arrow_forward, color: Color(0xFFE91E63)), // Seta Rosa
-                                  _buildTimeButton(
-                                    "Fechamento",
-                                    fechamento,
-                                    () => _selecionarHora(index, 'fechamento', fechamento)
-                                  ),
-                                ],
-                              ),
+                          value: ativo,
+                          onChanged: (val) => _atualizarHorario(index, {'ativo': val}),
+                        ),
+                        if (ativo)
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                _buildTimeButton(primaryColor, "Abertura", abertura, () => _selecionarHora(index, 'abertura', abertura)),
+                                Icon(Icons.arrow_forward, color: primaryColor), 
+                                _buildTimeButton(primaryColor, "Fechamento", fechamento, () => _selecionarHora(index, 'fechamento', fechamento)),
+                              ],
                             ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                          ),
+                      ],
+                    ),
+                  );
+                },
+              ),
         ),
       ],
     );
   }
 
-  Widget _buildTimeButton(String label, String time, VoidCallback onTap) {
+  Widget _buildTimeButton(Color primaryColor, String label, String time, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(10),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          border: Border.all(color: const Color(0xFFE91E63).withOpacity(0.3)), // Borda Rosa Suave
+          border: Border.all(color: primaryColor.withOpacity(0.3)), 
           borderRadius: BorderRadius.circular(10),
-          color: Colors.pink[50]?.withOpacity(0.5), // Fundo rosinha bem leve
+          color: primaryColor.withOpacity(0.05), 
         ),
         child: Column(
           children: [
             Text(label, style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey[700])),
             Text(
               time,
-              style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xFFE91E63))
+              style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: primaryColor) 
             ),
           ],
         ),

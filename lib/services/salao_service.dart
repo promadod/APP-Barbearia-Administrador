@@ -16,18 +16,20 @@ class SalaoService {
   // ==========================================================
   // PARTE 0: PERFIL DA LOJA
   // ==========================================================
-  
+
   // 1. BUSCAR DADOS DO PRÓPRIO SALÃO
   Future<Map<String, dynamic>> getDadosSalao() async {
     try {
       await _configurarToken();
-      final response = await _client.dio.get('salao/perfil/'); 
-      
-      // O Django retorna 'whatsapp', mas o app usa 'telefone'. Vamos mapear:
+      final response = await _client.dio.get('salao/perfil/');
+
       final dados = response.data;
+
+      
       return {
+        'id': dados['id'], 
         'nome': dados['nome'],
-        'telefone': dados['whatsapp'], // <--- CORREÇÃO AQUI (Lê whatsapp do banco)
+        'telefone': dados['whatsapp'],
         'instagram': dados['instagram'],
         'endereco': dados['endereco'],
         'bloqueia_conflitos': dados['bloqueia_conflitos'],
@@ -50,7 +52,7 @@ class SalaoService {
       await _configurarToken();
       await _client.dio.patch('salao/perfil/', data: {
         'nome': nome,
-        'whatsapp': telefone, // <--- CORREÇÃO AQUI (Envia como 'whatsapp')
+        'whatsapp': telefone,
         'instagram': instagram,
         'endereco': endereco,
         'bloqueia_conflitos': bloqueiaConflitos,
@@ -96,17 +98,18 @@ class SalaoService {
   }
 
   // Cadastrar Novo Serviço
-  Future<bool> cadastrarServico(String nome, String preco, String duracao) async {
+  Future<bool> cadastrarServico(
+      String nome, String preco, String duracao) async {
     try {
       await _configurarToken();
-      
+
       double precoFinal = double.tryParse(preco.replaceAll(',', '.')) ?? 0.0;
-      int duracaoFinal = int.tryParse(duracao) ?? 30; 
+      int duracaoFinal = int.tryParse(duracao) ?? 30;
 
       await _client.dio.post('servicos/', data: {
         'nome': nome,
         'preco': precoFinal,
-        'duracao_minutos': duracaoFinal 
+        'duracao_minutos': duracaoFinal
       });
       return true;
     } catch (e) {
@@ -116,7 +119,8 @@ class SalaoService {
   }
 
   // Editar Serviço
-  Future<bool> editarServico(int id, String nome, String preco, String duracao) async {
+  Future<bool> editarServico(
+      int id, String nome, String preco, String duracao) async {
     try {
       await _configurarToken();
       await _client.dio.patch('servicos/$id/', data: {
@@ -149,11 +153,11 @@ class SalaoService {
   Future<List<dynamic>> getAgendamentosPorData(DateTime data) async {
     try {
       await _configurarToken();
-      
+
       String dataFormatada = DateFormat('yyyy-MM-dd').format(data);
-      
+
       final response = await _client.dio.get('agenda/?data=$dataFormatada');
-      
+
       return response.data;
     } catch (e) {
       print('Erro ao buscar agenda: $e');
@@ -165,9 +169,7 @@ class SalaoService {
   Future<bool> atualizarStatusAgendamento(int id, String novoStatus) async {
     try {
       await _configurarToken();
-      await _client.dio.patch('agenda/$id/', data: {
-        'status': novoStatus
-      });
+      await _client.dio.patch('agenda/$id/', data: {'status': novoStatus});
       return true;
     } catch (e) {
       print('Erro ao atualizar status: $e');
@@ -181,7 +183,8 @@ class SalaoService {
   Future<Map<String, dynamic>> getRelatorioFinanceiro(String periodo) async {
     try {
       await _configurarToken();
-      final response = await _client.dio.get('agenda/relatorio_financeiro/?periodo=$periodo');
+      final response = await _client.dio
+          .get('agenda/relatorio_financeiro/?periodo=$periodo');
       return response.data;
     } catch (e) {
       print('Erro ao buscar financeiro: $e');
@@ -210,12 +213,13 @@ class SalaoService {
   // ==========================================================
   // PARTE 6: HISTÓRICO DE AGENDAMENTOS (FILTROS)
   // ==========================================================
-  Future<List<dynamic>> getHistoricoAgendamentos({String? status, DateTime? data}) async {
+  Future<List<dynamic>> getHistoricoAgendamentos(
+      {String? status, DateTime? data}) async {
     try {
       await _configurarToken();
-      
+
       String query = 'agenda/?';
-      
+
       if (status != null && status != 'TODOS') {
         query += 'status=$status&';
       }
@@ -231,5 +235,4 @@ class SalaoService {
       return [];
     }
   }
-
 }

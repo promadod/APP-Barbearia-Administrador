@@ -32,7 +32,7 @@ class AuthService {
         // 3. Configura o cliente API para usar esse token imediatamente
         _client.setToken(token);
 
-        return true; // Sucesso
+        return true; 
       }
       return false;
     } on DioException catch (e) {
@@ -46,6 +46,6 @@ class AuthService {
 
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Limpa tudo ao sair
+    await prefs.clear(); 
   }
 }

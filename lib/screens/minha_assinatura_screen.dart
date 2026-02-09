@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Para copiar PIX
+import 'package:flutter/services.dart'; 
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../services/api_client.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../config.dart'; 
 
 class MinhaAssinaturaScreen extends StatefulWidget {
   const MinhaAssinaturaScreen({super.key});
@@ -31,9 +32,7 @@ class _MinhaAssinaturaScreenState extends State<MinhaAssinaturaScreen> {
     if (token != null) _client.setToken(token);
 
     try {
-      // Busca faturas
       final faturasResp = await _client.dio.get('minhas-faturas/');
-      // Busca dados do PIX ( endpoint novo que criamos na view)
       final pixResp = await _client.dio.get('minhas-faturas/dados_pagamento/');
 
       setState(() {
@@ -50,43 +49,42 @@ class _MinhaAssinaturaScreenState extends State<MinhaAssinaturaScreen> {
   @override
   Widget build(BuildContext context) {
     final moeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+    
+    // VARIÁVEIS DE COR DINÂMICAS
+    final primaryColor = Theme.of(context).primaryColor;
+    final secondaryColor = Theme.of(context).colorScheme.secondary;
 
     return Stack(
       children: [
-        Positioned.fill(child: Image.asset('assets/images/login_bg.jpeg', fit: BoxFit.cover)),
-        Positioned.fill(child: Container(color: Colors.white.withOpacity(0.85))),
+        Positioned.fill(child: Image.asset(AppConfig.assetBackground, fit: BoxFit.cover)),
+        Positioned.fill(child: Container(color: Colors.white.withOpacity(0.60))),
 
         Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
-            title: Text("Minha Assinatura", style: GoogleFonts.poppins(color: const Color(0xFF880E4F), fontWeight: FontWeight.bold)),
+            title: Text("Minha Assinatura", style: GoogleFonts.poppins(color: Colors.black87, fontWeight: FontWeight.bold)),
             backgroundColor: Colors.transparent,
             elevation: 0,
-            iconTheme: const IconThemeData(color: Color(0xFFE91E63)),
+            iconTheme: IconThemeData(color: primaryColor),
           ),
           body: _isLoading 
-            ? const Center(child: CircularProgressIndicator(color: Color(0xFFE91E63)))
+            ? Center(child: CircularProgressIndicator(color: primaryColor))
             : SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    // CARD DO PIX
+                    // CARD DO PIX (GRADIENTE DINÂMICO)
                     Container(
-                      padding: const EdgeInsets.all(25), // Aumentei um pouco o padding para ficar mais imponente
+                      padding: const EdgeInsets.all(25),
                       decoration: BoxDecoration(
-                        // DEGRADÊ PADRÃO DO SISTEMA (Rosa para Roxo)
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFEC407A), Color(0xFFAB47BC)], 
+                        gradient: LinearGradient(
+                          colors: [primaryColor, secondaryColor], 
                           begin: Alignment.topLeft, 
                           end: Alignment.bottomRight
                         ),
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFFEC407A).withOpacity(0.4), 
-                            blurRadius: 10, 
-                            offset: const Offset(0, 5)
-                          )
+                          BoxShadow(color: primaryColor.withOpacity(0.4), blurRadius: 10, offset: const Offset(0, 5))
                         ],
                       ),
                       child: Column(
@@ -140,7 +138,6 @@ class _MinhaAssinaturaScreenState extends State<MinhaAssinaturaScreen> {
                     ),
                     const SizedBox(height: 15),
 
-                    // LISTA DE FATURAS
                     if (_faturas.isEmpty)
                       const Text("Nenhuma fatura encontrada.")
                     else
@@ -156,6 +153,7 @@ class _MinhaAssinaturaScreenState extends State<MinhaAssinaturaScreen> {
 
                           return Card(
                             margin: const EdgeInsets.only(bottom: 10),
+                            color: Colors.white.withOpacity(0.95),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                             child: ListTile(
                               leading: Icon(

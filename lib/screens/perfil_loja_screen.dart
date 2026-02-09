@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Importante para o Clipboard
+import 'package:flutter/services.dart'; 
 import 'package:google_fonts/google_fonts.dart';
 import '../services/salao_service.dart';
+import '../config.dart'; 
 
 class PerfilLojaScreen extends StatefulWidget {
   const PerfilLojaScreen({super.key});
@@ -26,8 +27,11 @@ class _PerfilLojaScreenState extends State<PerfilLojaScreen> {
   // Variável para armazenar o ID (para o Link)
   int? _salaoId;
 
+  // Variável de Diagnóstico (Para vermos o que o servidor mandou)
+  String _debugDadosRecebidos = "Carregando...";
+
   // URL Base do App Cliente (Seu link do Vercel)
-  final String _baseUrlAppCliente = "https://bela-agenda-app.vercel.app/#/";
+  final String _baseUrlAppCliente = "https://barber-agendamento.vercel.app/#/";
 
   @override
   void initState() {
@@ -37,25 +41,32 @@ class _PerfilLojaScreenState extends State<PerfilLojaScreen> {
 
   void _carregarDados() async {
     setState(() => _isLoading = true);
+
+    // Busca os dados brutos do Service
     final dados = await _service.getDadosSalao();
 
-    if (dados.isNotEmpty) {
-      // Captura o ID para gerar o link
-      _salaoId = dados['id'];
+    setState(() {
+      _isLoading = false;
+      // Salva o JSON bruto para exibir no quadro de diagnóstico se precisar
+      _debugDadosRecebidos = dados.toString();
 
-      _nomeController.text = dados['nome'] ?? '';
-      _telefoneController.text = dados['telefone'] ?? '';
-      _instagramController.text = dados['instagram'] ?? '';
-      _enderecoController.text = dados['endereco'] ?? '';
+      if (dados.isNotEmpty) {
+        // --- PROTEÇÃO DE ID ---
+        // Tenta converter para Inteiro, mesmo se vier como String "1"
+        if (dados['id'] != null) {
+          _salaoId = int.tryParse(dados['id'].toString());
+        }
 
-      if (dados['bloqueia_conflitos'] != null) {
-        setState(() {
+        _nomeController.text = dados['nome'] ?? '';
+        _telefoneController.text = dados['telefone'] ?? '';
+        _instagramController.text = dados['instagram'] ?? '';
+        _enderecoController.text = dados['endereco'] ?? '';
+
+        if (dados['bloqueia_conflitos'] != null) {
           _bloqueiaConflitos = dados['bloqueia_conflitos'];
-        });
+        }
       }
-    }
-
-    setState(() => _isLoading = false);
+    });
   }
 
   void _salvar() async {
@@ -96,38 +107,74 @@ class _PerfilLojaScreenState extends State<PerfilLojaScreen> {
     Clipboard.setData(ClipboardData(text: link));
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text("Link copiado: $link"),
-      backgroundColor: const Color(0xFFE91E63),
+      backgroundColor: Colors.green,
       behavior: SnackBarBehavior.floating,
     ));
   }
 
   @override
   Widget build(BuildContext context) {
+    // COR DINÂMICA
+    final primaryColor = Theme.of(context).primaryColor;
+
     return Stack(
       children: [
+        // 1. FOTO DINÂMICA
         Positioned.fill(
-            child:
-                Image.asset('assets/images/login_bg.jpeg', fit: BoxFit.cover)),
-        Positioned.fill(child: Container(color: Colors.white.withOpacity(0.7))),
+            child: Image.asset(AppConfig.assetBackground, fit: BoxFit.cover)),
+        
+        // 2. MÁSCARA 0.60
+        Positioned.fill(child: Container(color: Colors.white.withOpacity(0.60))),
+        
+        // 3. CONTEÚDO
         Scaffold(
           backgroundColor: Colors.transparent,
           appBar: AppBar(
             title: Text("Configurar Loja",
                 style: GoogleFonts.poppins(
-                    color: const Color(0xFF880E4F),
+                    color: Colors.black87,
                     fontWeight: FontWeight.bold)),
             backgroundColor: Colors.transparent,
             elevation: 0,
-            iconTheme: const IconThemeData(color: Color(0xFFE91E63)),
+            iconTheme: IconThemeData(color: primaryColor), 
           ),
           body: _isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(color: Color(0xFFE91E63)))
+              ? Center(
+                  child: CircularProgressIndicator(color: primaryColor))
               : SingleChildScrollView(
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      // --- NOVO: CARD DO LINK DE AGENDAMENTO ---
+                      // --- QUADRO DE DIAGNÓSTICO (Só aparece se der erro) ---
+                      if (_salaoId == null)
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 20),
+                          padding: const EdgeInsets.all(15),
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade50,
+                            border: Border.all(color: Colors.red),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            children: [
+                              const Text("⚠️ MODO DIAGNÓSTICO ⚠️",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red)),
+                              const SizedBox(height: 5),
+                              const Text(
+                                  "O ID da loja não foi encontrado. Veja abaixo o que o App recebeu do sistema:",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: 12)),
+                              const Divider(),
+                              Text(_debugDadosRecebidos,
+                                  style: const TextStyle(
+                                      fontFamily: "Courier", fontSize: 10)),
+                            ],
+                          ),
+                        ),
+
+                      // --- CARD DO LINK DE AGENDAMENTO ---
                       if (_salaoId != null)
                         Container(
                           margin: const EdgeInsets.only(bottom: 25),
@@ -137,26 +184,24 @@ class _PerfilLojaScreenState extends State<PerfilLojaScreen> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                                color:
-                                    const Color(0xFFE91E63).withOpacity(0.3)),
+                                color: primaryColor.withOpacity(0.3)),
                             boxShadow: [
                               BoxShadow(
-                                  color:
-                                      const Color(0xFFE91E63).withOpacity(0.1),
+                                  color: primaryColor.withOpacity(0.1),
                                   blurRadius: 10,
                                   offset: const Offset(0, 4))
                             ],
                           ),
                           child: Column(
                             children: [
-                              const Icon(Icons.share,
-                                  size: 40, color: Color(0xFFE91E63)),
+                              Icon(Icons.share,
+                                  size: 40, color: primaryColor),
                               const SizedBox(height: 10),
                               Text("Seu Link de Agendamento",
                                   style: GoogleFonts.poppins(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
-                                      color: const Color(0xFF880E4F))),
+                                      color: Colors.black87)),
                               const SizedBox(height: 5),
                               Text(
                                 "Envie este link para seus clientes agendarem:",
@@ -168,7 +213,7 @@ class _PerfilLojaScreenState extends State<PerfilLojaScreen> {
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFCE4EC),
+                                  color: primaryColor.withOpacity(0.1),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Row(
@@ -179,13 +224,13 @@ class _PerfilLojaScreenState extends State<PerfilLojaScreen> {
                                         overflow: TextOverflow.ellipsis,
                                         style: GoogleFonts.poppins(
                                             fontWeight: FontWeight.w600,
-                                            color: const Color(0xFFC2185B)),
+                                            color: primaryColor), 
                                       ),
                                     ),
                                     const SizedBox(width: 10),
                                     IconButton(
-                                      icon: const Icon(Icons.copy,
-                                          color: Color(0xFFE91E63)),
+                                      icon: Icon(Icons.copy,
+                                          color: primaryColor), 
                                       onPressed: _copiarLink,
                                       tooltip: "Copiar Link",
                                     )
@@ -196,30 +241,34 @@ class _PerfilLojaScreenState extends State<PerfilLojaScreen> {
                           ),
                         ),
 
-                      // --- FORMULÁRIO EXISTENTE ---
+                      // --- FORMULÁRIO ---
                       _buildCardInput(
                           icon: Icons.store,
                           label: "Nome do Salão",
-                          controller: _nomeController),
+                          controller: _nomeController,
+                          primaryColor: primaryColor),
                       const SizedBox(height: 15),
                       _buildCardInput(
                           icon: Icons.phone_iphone,
                           label: "WhatsApp de Suporte",
                           controller: _telefoneController,
                           hint: "Ex: 21999999999",
-                          keyboard: TextInputType.phone),
+                          keyboard: TextInputType.phone,
+                          primaryColor: primaryColor),
                       const SizedBox(height: 15),
                       _buildCardInput(
                           icon: Icons.camera_alt,
                           label: "Instagram (Usuário)",
                           controller: _instagramController,
-                          hint: "Ex: @salaodamaria"),
+                          hint: "Ex: @salaodamaria",
+                          primaryColor: primaryColor),
                       const SizedBox(height: 15),
                       _buildCardInput(
                           icon: Icons.location_on,
                           label: "Endereço Completo",
                           controller: _enderecoController,
-                          maxLines: 2),
+                          maxLines: 2,
+                          primaryColor: primaryColor),
 
                       const SizedBox(height: 25),
 
@@ -231,7 +280,7 @@ class _PerfilLojaScreenState extends State<PerfilLojaScreen> {
                           borderRadius: BorderRadius.circular(15),
                           border: Border.all(
                               color: _bloqueiaConflitos
-                                  ? const Color(0xFFE91E63)
+                                  ? primaryColor
                                   : Colors.grey.shade300,
                               width: 1.5),
                           boxShadow: [
@@ -242,7 +291,7 @@ class _PerfilLojaScreenState extends State<PerfilLojaScreen> {
                           ],
                         ),
                         child: SwitchListTile(
-                          activeColor: const Color(0xFFE91E63),
+                          activeColor: primaryColor, 
                           title: Text("Bloquear Horários Ocupados?",
                               style: GoogleFonts.poppins(
                                   fontWeight: FontWeight.bold, fontSize: 14)),
@@ -266,13 +315,13 @@ class _PerfilLojaScreenState extends State<PerfilLojaScreen> {
                         child: ElevatedButton(
                           onPressed: _salvar,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFE91E63),
+                            backgroundColor: primaryColor, 
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15)),
                           ),
                           child: Text("SALVAR ALTERAÇÕES",
                               style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.bold, fontSize: 16)),
+                                  fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
                         ),
                       )
                     ],
@@ -287,6 +336,7 @@ class _PerfilLojaScreenState extends State<PerfilLojaScreen> {
       {required IconData icon,
       required String label,
       required TextEditingController controller,
+      required Color primaryColor, 
       String? hint,
       TextInputType? keyboard,
       int maxLines = 1}) {
@@ -309,7 +359,7 @@ class _PerfilLojaScreenState extends State<PerfilLojaScreen> {
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,
-          prefixIcon: Icon(icon, color: const Color(0xFFE91E63)),
+          prefixIcon: Icon(icon, color: primaryColor), 
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,

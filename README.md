@@ -1,13 +1,13 @@
-# APP Bela Agenda  SaaS - App Admin (Gestão)
+# APP Barbearia Agenda  SaaS - App Admin (Gestão)
 
-Aplicativo desenvolvido em **Flutter** para gestão completa de estabelecimentos de beleza (Salões, Barbearias, Esmalterias e Clínicas de Estética). Este é o painel administrativo utilizado pelos donos das lojas para gerenciar seus negócios dentro do ecossistema SaaS.
+Aplicativo desenvolvido em **Flutter** para gestão completa de estabelecimentos de barbearia.Este é o painel administrativo utilizado pelos donos das lojas para gerenciar seus negócios dentro do ecossistema SaaS.
 
 ## 📱 Funcionalidades Principais
 
 ### 📅 Gestão de Agenda Inteligente
 * Visualização de agendamentos solicitados pelos clientes.
 * **Aprovação/Recusa** de horários.
-* **Controle de Conflitos:** Sistema inteligente que impede (ou permite) agendamentos simultâneos dependendo do nicho (ex: Salão vs Bronzeamento), configurável pelo usuário.
+* **Controle de Conflitos:** Sistema inteligente que impede (ou permite) agendamentos simultâneos dependendo da logistica de trabalho, configurável pelo usuário.
 
 ### 💰 Controle Financeiro
 * **Dashboard em Tempo Real:** Faturamento do dia e agendamentos pendentes.
@@ -50,7 +50,7 @@ Aplicativo desenvolvido em **Flutter** para gestão completa de estabelecimentos
 
 ### Pré-requisitos
 * Flutter SDK.
-* Backend Django rodando
+* Backend Django Rest Framework
 
 
 

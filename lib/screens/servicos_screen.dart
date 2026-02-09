@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../services/salao_service.dart';
+import '../config.dart'; 
 
 class ServicosScreen extends StatefulWidget {
   const ServicosScreen({super.key});
@@ -57,6 +58,9 @@ class _ServicosScreenState extends State<ServicosScreen> {
   // --- MODAL DE CADASTRO/EDIÇÃO ---
   void _abrirModalFormulario({Map<String, dynamic>? servicoParaEditar}) {
     final bool isEditando = servicoParaEditar != null;
+    
+    // Pega a cor do tema atual (Azul ou Rosa)
+    final primaryColor = Theme.of(context).primaryColor;
 
     if (isEditando) {
       _nomeController.text = servicoParaEditar['nome'];
@@ -73,7 +77,7 @@ class _ServicosScreenState extends State<ServicosScreen> {
       _nomeController.clear();
       _precoController.clear();
       _horasController.clear();
-      _minutosController.text = "30"; // Padrão
+      _minutosController.text = "30"; 
     }
 
     showDialog(
@@ -111,9 +115,9 @@ class _ServicosScreenState extends State<ServicosScreen> {
                     controller: _horasController,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
-                      labelText: "Horas",
-                      prefixIcon: Icon(Icons.access_time),
-                      suffixText: "h",
+                      labelText: "Horas", 
+                      prefixIcon: Icon(Icons.access_time), 
+                      suffixText: "h", 
                       hintText: "0"
                     ),
                   ),
@@ -124,9 +128,9 @@ class _ServicosScreenState extends State<ServicosScreen> {
                     controller: _minutosController,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
-                      labelText: "Minutos",
-                      prefixIcon: Icon(Icons.timer),
-                      suffixText: "min",
+                      labelText: "Minutos", 
+                      prefixIcon: Icon(Icons.timer), 
+                      suffixText: "min", 
                       hintText: "30"
                     ),
                   ),
@@ -138,7 +142,8 @@ class _ServicosScreenState extends State<ServicosScreen> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancelar")),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE91E63), foregroundColor: Colors.white),
+            // Usa a cor dinâmica no botão de salvar
+            style: ElevatedButton.styleFrom(backgroundColor: primaryColor, foregroundColor: Colors.white),
             onPressed: () async {
               if (_nomeController.text.isEmpty || _precoController.text.isEmpty) return;
 
@@ -147,7 +152,7 @@ class _ServicosScreenState extends State<ServicosScreen> {
               int m = int.tryParse(_minutosController.text) ?? 0;
               int totalMinutosCalculado = (h * 60) + m;
 
-              if (totalMinutosCalculado == 0) totalMinutosCalculado = 30; // Evita duração zero
+              if (totalMinutosCalculado == 0) totalMinutosCalculado = 30; 
 
               Navigator.pop(context); 
               setState(() => _isLoading = true);
@@ -252,30 +257,33 @@ class _ServicosScreenState extends State<ServicosScreen> {
   @override
   Widget build(BuildContext context) {
     final moeda = NumberFormat.currency(locale: 'pt_BR', symbol: 'R\$');
+    
+    // Variável de Cor Dinâmica
+    final primaryColor = Theme.of(context).primaryColor;
 
-    // 1. APLICANDO O STACK PARA O FUNDO (Igual ao Financeiro)
+    // 1. APLICANDO O STACK PARA O FUNDO (Atualizado)
     return Stack(
       children: [
-        // FOTO
+        // FOTO DE FUNDO (Pega do Config)
         Positioned.fill(
-          child: Image.asset('assets/images/login_bg.jpeg', fit: BoxFit.cover),
+          child: Image.asset(AppConfig.assetBackground, fit: BoxFit.cover),
         ),
-        // MÁSCARA BRANCA (0.7)
+        // MÁSCARA BRANCA (0.60)
         Positioned.fill(
-          child: Container(color: Colors.white.withOpacity(0.7)),
+          child: Container(color: Colors.white.withOpacity(0.60)),
         ),
 
         // 2. SCAFFOLD TRANSPARENTE
         Scaffold(
-          backgroundColor: Colors.transparent, // Transparente para ver a foto
+          backgroundColor: Colors.transparent, 
           appBar: AppBar(
-            title: Text("Meus Serviços", style: GoogleFonts.poppins(color: const Color(0xFF880E4F), fontWeight: FontWeight.bold)),
+            title: Text("Meus Serviços", style: GoogleFonts.poppins(color: Colors.black87, fontWeight: FontWeight.bold)),
             backgroundColor: Colors.transparent,
             elevation: 0,
-            iconTheme: const IconThemeData(color: Color(0xFFE91E63)), // Ícone Rosa
+            iconTheme: IconThemeData(color: primaryColor), 
           ),
           body: _isLoading 
-            ? const Center(child: CircularProgressIndicator(color: Color(0xFFE91E63)))
+            ? Center(child: CircularProgressIndicator(color: primaryColor))
             : ListView.builder(
                 padding: const EdgeInsets.all(16),
                 itemCount: _servicos.length,
@@ -290,7 +298,7 @@ class _ServicosScreenState extends State<ServicosScreen> {
                   return Card(
                     elevation: 2,
                     margin: const EdgeInsets.only(bottom: 12),
-                    color: Colors.white.withOpacity(0.95), // Card levemente transparente
+                    color: Colors.white.withOpacity(0.95), 
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                     child: InkWell( 
                       onTap: () => _mostrarOpcoes(item), 
@@ -300,8 +308,12 @@ class _ServicosScreenState extends State<ServicosScreen> {
                         child: ListTile(
                           leading: Container(
                             padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(color: const Color(0xFFE91E63).withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
-                            child: const Icon(Icons.spa, color: Color(0xFFE91E63)),
+                            decoration: BoxDecoration(
+                                // Fundo do ícone com opacidade da cor tema
+                                color: primaryColor.withOpacity(0.15), 
+                                borderRadius: BorderRadius.circular(8)
+                            ),
+                            child: Icon(Icons.spa, color: primaryColor), 
                           ),
                           title: Text(item['nome'], style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
                           
@@ -310,7 +322,7 @@ class _ServicosScreenState extends State<ServicosScreen> {
                           
                           trailing: Text(
                             moeda.format(preco), 
-                            style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: const Color(0xFFE91E63), fontSize: 16)
+                            style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: primaryColor, fontSize: 16)
                           ),
                         ),
                       ),
@@ -320,7 +332,7 @@ class _ServicosScreenState extends State<ServicosScreen> {
               ),
           floatingActionButton: FloatingActionButton(
             onPressed: () => _abrirModalFormulario(),
-            backgroundColor: const Color(0xFFE91E63),
+            backgroundColor: primaryColor, 
             child: const Icon(Icons.add, color: Colors.white),
           ),
         ),
