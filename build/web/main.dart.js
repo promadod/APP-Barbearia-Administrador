@@ -48661,7 +48661,7 @@ case 1:return A.K(q,r)}})
 return A.L($async$BD,r)},
 ad_(){var s,r=null,q=this.z
 if(q==null)return
-s="https://barber-agendamento.vercel.app/#/"+A.l(q)
+s="https://barbearia-oneira.vercel.app/#/"+A.l(q)
 A.vj(new A.ob(s))
 this.c.ad(t.J).f.hM(A.atX(r,r,r,B.bQ,B.vM,B.C,r,A.al("Link copiado: "+s,r,r,r,r,r,r,r),r,B.cf,r,r,r,r,r,r,r,r,r,r))},
 J(a){var s,r,q,p,o,n,m,l,k,j,i=this,h=null,g=A.I(a).dx,f=A.ei(0,A.l8("assets/images/barber_bg.jpeg",B.ct)),e=A.ei(0,A.bK(h,h,B.q,A.a8(153,B.f.p()>>>16&255,B.f.p()>>>8&255,B.f.p()&255),h,h,h,h,h,h,h,h,h)),d=A.md(h,!0,B.A,0,new A.cv(h,h,h,h,h,g,h,h,h),A.al("Configurar Loja",h,h,h,A.bp().$2$color$fontWeight(B.a5,B.T),h,h,h))
@@ -48678,7 +48678,7 @@ m=A.al("Seu Link de Agendamento",h,h,h,A.bp().$3$color$fontSize$fontWeight(B.a5,
 l=A.al("Envie este link para seus clientes agendarem:",h,h,h,A.bp().$2$color$fontSize(B.cT,12),B.e1,h,h)
 k=g.b9(0.1)
 j=A.bT(10)
-r.push(A.bK(h,A.bJ(A.b([n,B.cI,m,B.i9,l,B.i8,A.bK(h,A.cN(A.b([A.cu(A.al("https://barber-agendamento.vercel.app/#/"+A.l(i.z),h,B.aJ,h,A.bp().$2$color$fontWeight(g,B.dT),h,h,h),1),B.i7,A.ja(h,h,h,A.df(B.zb,g,h,h),h,h,i.gacZ(),h,h,h,"Copiar Link")],s),B.z,B.v,B.w,0,h),B.q,h,h,new A.bA(k,h,h,j,h,h,B.a1),h,h,h,B.ha,h,h,h)],s),B.z,B.v,B.w,0,B.E),B.q,h,h,new A.bA(B.f,h,p,q,o,h,B.a1),h,h,B.YX,B.bD,h,h,1/0))}r.push(i.abB(i.f,B.a_l,"Nome do Sal\xe3o",g))
+r.push(A.bK(h,A.bJ(A.b([n,B.cI,m,B.i9,l,B.i8,A.bK(h,A.cN(A.b([A.cu(A.al("https://barbearia-oneira.vercel.app/#/"+A.l(i.z),h,B.aJ,h,A.bp().$2$color$fontWeight(g,B.dT),h,h,h),1),B.i7,A.ja(h,h,h,A.df(B.zb,g,h,h),h,h,i.gacZ(),h,h,h,"Copiar Link")],s),B.z,B.v,B.w,0,h),B.q,h,h,new A.bA(k,h,h,j,h,h,B.a1),h,h,h,B.ha,h,h,h)],s),B.z,B.v,B.w,0,B.E),B.q,h,h,new A.bA(B.f,h,p,q,o,h,B.a1),h,h,B.YX,B.bD,h,h,1/0))}r.push(i.abB(i.f,B.a_l,"Nome do Sal\xe3o",g))
 r.push(B.i8)
 r.push(i.abE(i.r,"Ex: 21999999999",B.a_g,B.S3,"WhatsApp de Suporte",g))
 r.push(B.i8)

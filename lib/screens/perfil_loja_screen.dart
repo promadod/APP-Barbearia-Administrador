@@ -31,7 +31,7 @@ class _PerfilLojaScreenState extends State<PerfilLojaScreen> {
   String _debugDadosRecebidos = "Carregando...";
 
   // URL Base do App Cliente (Seu link do Vercel)
-  final String _baseUrlAppCliente = "https://barber-agendamento.vercel.app/#/";
+  final String _baseUrlAppCliente = "https://barbearia-oneira.vercel.app/#/";
 
   @override
   void initState() {
