@@ -2,8 +2,8 @@ import 'package:dio/dio.dart';
 
 class ApiClient {
   
-
-  static const String baseUrl = 'https://oneiratech01.pythonanywhere.com/api/';
+  static const String baseUrl = 'https://127.0.0.1:8000/api/';
+  //static const String baseUrl = 'https://oneiratech01.pythonanywhere.com/api/';
 
   final Dio dio = Dio(BaseOptions(
     baseUrl: baseUrl,
