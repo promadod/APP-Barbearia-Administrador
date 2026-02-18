@@ -35,18 +35,18 @@ class _BaseScreenState extends State<BaseScreen> {
 
     return Stack(
       children: [
-        // 1. IMAGEM DE FUNDO GLOBAL (Caminho da foto digitado diretamente)
+        // 1. IMAGEM DE FUNDO GLOBAL
         Positioned.fill(
           child: Image.asset(
-            'assets/images/login_bg.jpeg', // <--- SUBSTITUÍ PELA FOTO DIRETO AQUI
+            'assets/images/login_bg.jpeg',
             fit: BoxFit.cover,
           ),
         ),
         
-        // 2. CAMADA BRANCA SEMI-TRANSPARENTE (Opacidade reduzida para ver a foto)
+        // 2. CAMADA BRANCA SEMI-TRANSPARENTE
         Positioned.fill(
           child: Container(
-            color: Colors.white.withOpacity(0.4), // <--- MUDEI DE 0.92 PARA 0.4
+            color: Colors.white.withOpacity(0.4),
           ),
         ),
 
